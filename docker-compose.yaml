@@ -1,0 +1,134 @@
+services:
+
+  bankconfigserver:
+    image: "kgiris/bankconfigserver:0-1-SNAPSHOT"
+    container_name: bankconfigserver-ms
+    ports:
+      - "8071:8071"
+    healthcheck:
+#      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      test:  [
+        "CMD",
+        "curl",
+        "--fail",
+        "--silent",
+        "http://127.0.0.1:8071/actuator/health/readiness"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    extends:
+      file: common-config.yaml
+      service: microservice-base-config
+    environment:
+      SPRING_APPLICATION_NAME: bankconfigserver
+
+  eurekaserver:
+    image: "kgiris/eurekaserver:0-1-SNAPSHOT"
+    container_name: eurekaserver-ms
+    ports:
+      - "8070:8070"
+    healthcheck:
+      #      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      test:  [
+        "CMD",
+        "curl",
+        "--fail",
+        "--silent",
+        "http://127.0.0.1:8070/actuator/health/readiness"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    extends:
+      file: common-config.yaml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+
+
+
+  gateway:
+    image: "kgiris/gateway:0-1-SNAPSHOT"
+    container_name: gateway-ms
+    ports:
+      - "8072:8072"
+    depends_on:
+      accounts:
+        condition: service_healthy
+      loans:
+        condition: service_healthy
+      cards:
+        condition: service_healthy
+    extends:
+      file: common-config.yaml
+      service: microservice-eureka-config
+    environment:
+      SPRING_APPLICATION_NAME: gateway
+
+
+  accounts:
+    image: "kgiris/accounts:0-1-SNAPSHOT"
+    container_name: accounts-ms
+    ports:
+      - "8080:8080"
+    healthcheck:
+      #      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      test:  [
+        "CMD",
+        "curl",
+        "--fail",
+        "--silent",
+        "http://127.0.0.1:8080/actuator/health/readiness"
+      ]
+    extends:
+      file: common-config.yaml
+      service: microservice-eureka-config
+    environment:
+      SPRING_APPLICATION_NAME: accounts
+
+  loans:
+    image: "kgiris/loans:0-1-SNAPSHOT"
+    container_name: loans-ms
+    ports:
+      - "8090:8090"
+    healthcheck:
+      #      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      test:  [
+        "CMD",
+        "curl",
+        "--fail",
+        "--silent",
+        "http://127.0.0.1:8090/actuator/health/readiness"
+      ]
+    extends:
+      file: common-config.yaml
+      service: microservice-eureka-config
+    environment:
+      SPRING_APPLICATION_NAME: loans
+
+  cards:
+    image: "kgiris/cards:0-1-SNAPSHOT"
+    container_name: cards-ms
+    ports:
+      - "9000:9000"
+    healthcheck:
+      #      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      test:  [
+        "CMD",
+        "curl",
+        "--fail",
+        "--silent",
+        "http://127.0.0.1:9000/actuator/health/readiness"
+      ]
+    extends:
+      file: common-config.yaml
+      service: microservice-eureka-config
+    environment:
+      SPRING_APPLICATION_NAME: cards
+
+networks:
+  bank:
+    driver: "bridge"

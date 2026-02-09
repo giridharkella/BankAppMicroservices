@@ -1,0 +1,205 @@
+openapi: 3.1.0
+info:
+  title: Loans microservice REST API Documentation
+  description: Bank Loans microservice REST API Documentation
+  version: v1
+externalDocs:
+  description: Bank Loans microservice REST API Documentation
+  url: https://www.gks.com/swagger-ui.html
+servers:
+  - url: http://localhost:8090
+    description: Generated server url
+tags:
+  - name: Loans
+    description: >-
+      CRUD REST APIs in Bank to CREATE, UPDATE, FETCH AND DELETE loan
+      details
+paths:
+  /api/update:
+    put:
+      tags:
+        - Loans
+      summary: Update Loan Details REST API
+      description: REST API to update loan details based on a loan number
+      operationId: updateLoanDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoansDto'
+        required: true
+      responses:
+        '200':
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '417':
+          description: Expectation Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/create:
+    post:
+      tags:
+        - Loans
+      summary: Create Loan REST API
+      description: REST API to create new loan inside Bank
+      operationId: createLoan
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: (^$|[0-9]{10})
+      responses:
+        '201':
+          description: HTTP Status CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/fetch:
+    get:
+      tags:
+        - Loans
+      summary: Fetch Loan Details REST API
+      description: REST API to fetch loan details based on a mobile number
+      operationId: fetchLoanDetails
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: (^$|[0-9]{10})
+      responses:
+        '200':
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoansDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/delete:
+    delete:
+      tags:
+        - Loans
+      summary: Delete Loan Details REST API
+      description: REST API to delete Loan details based on a mobile number
+      operationId: deleteLoanDetails
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: (^$|[0-9]{10})
+      responses:
+        '200':
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '417':
+          description: Expectation Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+components:
+  schemas:
+    LoansDto:
+      type: object
+      description: Schema to hold Loan information
+      properties:
+        mobileNumber:
+          type: string
+          description: Mobile Number of Customer
+          examples: [4365327698]
+          minLength: 1
+          pattern: (^$|[0-9]{10})
+        loanNumber:
+          type: string
+          description: Loan Number of the customer
+          examples: [548732457654]
+          minLength: 1
+          pattern: (^$|[0-9]{12})
+        loanType:
+          type: string
+          description: Type of the loan
+          examples: [Home Loan]
+          minLength: 1
+        totalLoan:
+          type: integer
+          format: int32
+          description: Total loan amount
+          examples: [100000]
+        amountPaid:
+          type: integer
+          format: int32
+          description: Total loan amount paid
+          examples: [1000]
+        outstandingAmount:
+          type: integer
+          format: int32
+          description: Total outstanding amount against a loan
+          examples: [99000]
+      required:
+        - loanNumber
+        - loanType
+        - mobileNumber
+    ErrorResponseDto:
+      type: object
+      description: Schema to hold error response information
+      properties:
+        apiPath:
+          type: string
+          description: API path invoked by client
+        errorCode:
+          type: string
+          description: Error code representing the error happened
+        errorMessage:
+          type: string
+          description: Error message representing the error happened
+        errorTime:
+          type: string
+          format: date-time
+          description: Time representing when the error happened
+    ResponseDto:
+      type: object
+      description: Schema to hold successful response information
+      properties:
+        statusCode:
+          type: string
+          description: Status code in the response
+        statusMsg:
+          type: string
+          description: Status message in the response

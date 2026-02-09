@@ -1,0 +1,361 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Accounts
+  description: "CRUD REST APIs in Bank to CREATE, UPDATE, FETCH AND DELETE account details"
+paths:
+  /api/update:
+    put:
+      tags:
+      - Accounts
+      summary: Update Account Details REST API
+      description: REST API to update Customer &  Account details based on a account number
+      operationId: updateAccountDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDto'
+        required: true
+      responses:
+        "200":
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        "500":
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /api/create:
+    post:
+      tags:
+      - Accounts
+      summary: Create Account REST API
+      description: REST API to create new Customer &  Account inside Bank
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDto'
+        required: true
+      responses:
+        "201":
+          description: HTTP Status CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        "500":
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/java-version:
+    get:
+      tags:
+      - Accounts
+      operationId: getJavaVersion
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/fetch:
+    get:
+      tags:
+      - Accounts
+      summary: Fetch Account Details REST API
+      description: REST API to fetch Customer &  Account details based on a mobile number
+      operationId: fetchAccountDetails
+      parameters:
+      - name: mobileNumber
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: "(^$|[0-9]{10})"
+      responses:
+        "200":
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+        "500":
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/fetchCustomerDetails:
+    get:
+      tags:
+        - Customer
+      summary: Fetch Customer Details REST API
+      description: REST API to fetch Customer &  Account details based on a mobile number
+      operationId: fetchCustomerDetails
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: "(^$|[0-9]{10})"
+      responses:
+        "200":
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDetailsDto'
+        "500":
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/contact-info:
+    get:
+      tags:
+      - Accounts
+      operationId: getContactInfo
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsContactInfoDto'
+  /api/delete:
+    delete:
+      tags:
+      - Accounts
+      summary: Delete Account & Customer Details REST API
+      description: REST API to delete Customer &  Account details based on a mobile number
+      operationId: deleteAccountDetails
+      parameters:
+      - name: mobileNumber
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: "(^$|[0-9]{10})"
+      responses:
+        "200":
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+
+        "500":
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+components:
+  schemas:
+    AccountsDto:
+      type: object
+      description: Schema to hold Account information
+      properties:
+        accountNumber:
+          type: integer
+          format: int64
+          description: Account Number of Bank account
+          examples:
+          - 3454433243
+        accountType:
+          type: string
+          description: Account type of Bank account
+          examples:
+          - Savings
+          minLength: 1
+        branchAddress:
+          type: string
+          description: Bank branch address
+          examples:
+          - 123
+          minLength: 1
+      required:
+      - accountNumber
+      - accountType
+      - branchAddress
+    CustomerDto:
+      type: object
+      description: Schema to hold Customer and Account information
+      properties:
+        name:
+          type: string
+          description: Name of the customer
+          examples:
+          - Bytes
+          maxLength: 30
+          minLength: 5
+        email:
+          type: string
+          format: email
+          description: Email address of the customer
+          examples:
+          - tutor@bytes.com
+          minLength: 1
+        mobileNumber:
+          type: string
+          description: Mobile Number of the customer
+          examples:
+          - 9345432123
+          pattern: "(^$|[0-9]{10})"
+        accountsDto:
+          $ref: '#/components/schemas/AccountsDto'
+      required:
+        - name
+        - email
+        - mobileNumber
+    CustomerDetailsDto:
+      type: object
+      description: Schema to hold Customer and Account information
+      properties:
+
+        customerDto:
+          $ref: '#/components/schemas/CustomerDto'
+        cardsDto:
+          $ref: '#/components/schemas/CardsDto'
+        loansDto:
+          $ref: '#/components/schemas/LoansDto'
+
+    CardsDto:
+      type: object
+      description: Schema to hold Card information
+      properties:
+        mobileNumber:
+          type: string
+          description: Mobile Number of Customer
+          examples: [4354437687]
+          minLength: 1
+          pattern: (^$|[0-9]{10})
+        cardNumber:
+          type: string
+          description: Card Number of the customer
+          examples: [100646930341]
+          minLength: 1
+          pattern: (^$|[0-9]{12})
+        cardType:
+          type: string
+          description: Type of the card
+          examples: [Credit Card]
+          minLength: 1
+        totalLimit:
+          type: integer
+          format: int32
+          description: Total amount limit available against a card
+          examples: [100000]
+        amountUsed:
+          type: integer
+          format: int32
+          description: Total amount used by a Customer
+          examples: [1000]
+        availableAmount:
+          type: integer
+          format: int32
+          description: Total available amount against a card
+          examples: [90000]
+      required:
+        - cardNumber
+        - cardType
+        - mobileNumber
+    LoansDto:
+      type: object
+      description: Schema to hold Loan information
+      properties:
+        mobileNumber:
+          type: string
+          description: Mobile Number of Customer
+          examples: [4365327698]
+          minLength: 1
+          pattern: (^$|[0-9]{10})
+        loanNumber:
+          type: string
+          description: Loan Number of the customer
+          examples: [548732457654]
+          minLength: 1
+          pattern: (^$|[0-9]{12})
+        loanType:
+          type: string
+          description: Type of the loan
+          examples: [Home Loan]
+          minLength: 1
+        totalLoan:
+          type: integer
+          format: int32
+          description: Total loan amount
+          examples: [100000]
+        amountPaid:
+          type: integer
+          format: int32
+          description: Total loan amount paid
+          examples: [1000]
+        outstandingAmount:
+          type: integer
+          format: int32
+          description: Total outstanding amount against a loan
+          examples: [99000]
+      required:
+        - loanNumber
+        - loanType
+        - mobileNumber
+
+    ErrorResponseDto:
+      type: object
+      description: Schema to hold error response information
+      properties:
+        apiPath:
+          type: string
+          description: API path invoked by client
+        errorCode:
+          type: string
+          description: Error code representing the error happened
+        errorMessage:
+          type: string
+          description: Error message representing the error happened
+        errorTime:
+          type: string
+          format: date-time
+          description: Time representing when the error happened
+    ResponseDto:
+      type: object
+      description: Schema to hold successful response information
+      properties:
+        statusCode:
+          type: string
+          description: Status code in the response
+        statusMsg:
+          type: string
+          description: Status message in the response
+    AccountsContactInfoDto:
+      type: object
+      properties:
+        message:
+          type: string
+        contactDetails:
+          type: object
+          additionalProperties:
+            type: string
+        onCallSupport:
+          type: array
+          items:
+            type: string

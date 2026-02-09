@@ -1,0 +1,259 @@
+openapi: 3.1.0
+info:
+  title: Cards microservice REST API Documentation
+  description: bank Cards microservice REST API Documentation
+  contact:
+    name: GKS
+    url: https://www.gks.com
+    email: tutor@gks.com
+  license:
+    name: Apache 2.0
+    url: https://www.gks.com
+  version: v1
+externalDocs:
+  description: bank Cards microservice REST API Documentation
+  url: https://www.gks.com/swagger-ui.html
+servers:
+  - url: http://localhost:8090
+    description: Generated server url
+tags:
+  - name: CRUD REST APIs for Cards in bank
+    description: CRUD REST APIs in bank to CREATE, UPDATE, FETCH AND DELETE card details
+paths:
+  /api/update:
+    put:
+      tags:
+        - Cards
+      summary: Update Card Details REST API
+      description: REST API to update card details based on a card number
+      operationId: updateCardDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardsDto'
+        required: true
+      responses:
+        '200':
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '417':
+          description: Expectation Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/create:
+    post:
+      tags:
+        - Cards
+      summary: Create Card REST API
+      description: REST API to create new Card inside bank
+      operationId: createCard
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: (^$|[0-9]{10})
+      responses:
+        '201':
+          description: HTTP Status CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/java-version:
+    get:
+      tags:
+        - Cards
+      operationId: getJavaVersion
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/fetch:
+    get:
+      tags:
+        - Cards
+      summary: Fetch Card Details REST API
+      description: REST API to fetch card details based on a mobile number
+      operationId: fetchCardDetails
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: (^$|[0-9]{10})
+      responses:
+        '200':
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardsDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/contact-info:
+    get:
+      tags:
+        - Cards
+      operationId: getContactInfo
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardsContactInfoDto'
+  /api/build-info:
+    get:
+      tags:
+        - Cards
+      operationId: getBuildInfo
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/delete:
+    delete:
+      tags:
+        - Cards
+      summary: Delete Card Details REST API
+      description: REST API to delete Card details based on a mobile number
+      operationId: deleteCardDetails
+      parameters:
+        - name: mobileNumber
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: (^$|[0-9]{10})
+      responses:
+        '200':
+          description: HTTP Status OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '417':
+          description: Expectation Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '500':
+          description: HTTP Status Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+components:
+  schemas:
+    CardsDto:
+      type: object
+      description: Schema to hold Card information
+      properties:
+        mobileNumber:
+          type: string
+          description: Mobile Number of Customer
+          examples: [4354437687]
+          minLength: 1
+          pattern: (^$|[0-9]{10})
+        cardNumber:
+          type: string
+          description: Card Number of the customer
+          examples: [100646930341]
+          minLength: 1
+          pattern: (^$|[0-9]{12})
+        cardType:
+          type: string
+          description: Type of the card
+          examples: [Credit Card]
+          minLength: 1
+        totalLimit:
+          type: integer
+          format: int32
+          description: Total amount limit available against a card
+          examples: [100000]
+        amountUsed:
+          type: integer
+          format: int32
+          description: Total amount used by a Customer
+          examples: [1000]
+        availableAmount:
+          type: integer
+          format: int32
+          description: Total available amount against a card
+          examples: [90000]
+      required:
+        - cardNumber
+        - cardType
+        - mobileNumber
+    ErrorResponseDto:
+      type: object
+      description: Schema to hold error response information
+      properties:
+        apiPath:
+          type: string
+          description: API path invoked by client
+        errorCode:
+          type: string
+          description: Error code representing the error happened
+        errorMessage:
+          type: string
+          description: Error message representing the error happened
+        errorTime:
+          type: string
+          format: date-time
+          description: Time representing when the error happened
+    ResponseDto:
+      type: object
+      description: Schema to hold successful response information
+      properties:
+        statusCode:
+          type: string
+          description: Status code in the response
+        statusMsg:
+          type: string
+          description: Status message in the response
+    CardsContactInfoDto:
+      type: object
+      properties:
+        message:
+          type: string
+        contactDetails:
+          type: object
+          additionalProperties:
+            type: string
+        onCallSupport:
+          type: array
+          items:
+            type: string
